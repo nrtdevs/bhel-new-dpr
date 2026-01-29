@@ -2975,19 +2975,19 @@ const DPRReport = () => {
                 <CardBody>
                   <div className='d-flex justify-content-between align-items-center mb-1'>
                     <h5 className='fw-bolder mb-0'>{sheet.sheet_name}</h5>
-                    <span className='text-muted small'>Sheet ID: {sheet.sheet_id}</span>
+
                   </div>
                   <ScrollBar>
                     <div className='table-responsive'>
                       <Table bordered size='sm' className='text-nowrap mb-0 align-middle custom-dpr-table'>
                         <thead>
                           <tr style={{ backgroundColor: '#00338d', color: 'white' }}>
-                            <th className='text-white text-center' style={{ minWidth: '150px', backgroundColor: '#00338d', borderColor: '#00338d' }}>Area</th>
-                            <th className='text-white text-center' style={{ minWidth: '150px', backgroundColor: '#00338d', borderColor: '#00338d' }}></th>
-                            <th className='text-white text-center' style={{ minWidth: '150px', backgroundColor: '#00338d', borderColor: '#00338d' }}>Description</th>
-                            <th className='text-white text-center' style={{ minWidth: '60px', backgroundColor: '#00338d', borderColor: '#00338d' }}>UOM</th>
+                            <th className='text-white text-center' style={{ minWidth: '150px', backgroundColor: '#00338d', border: '1px solid #ffffff', fontSize: '12px', padding: '12px' }}>AREA</th>
+                            <th className='text-white text-center' style={{ minWidth: '150px', backgroundColor: '#00338d', border: '1px solid #ffffff', fontSize: '12px', padding: '12px' }}></th>
+                            <th className='text-white text-center' style={{ minWidth: '400px', backgroundColor: '#00338d', border: '1px solid #ffffff', fontSize: '12px', padding: '12px' }}>DESCRIPTION</th>
+                            <th className='text-white text-center' style={{ minWidth: '80px', backgroundColor: '#00338d', border: '1px solid #ffffff', fontSize: '12px', padding: '12px' }}>UOM</th>
                             {headers.map((header: string, hIdx: number) => (
-                              <th key={hIdx} className='text-white text-center' style={{ minWidth: '100px', backgroundColor: '#00338d', borderColor: '#00338d' }}>
+                              <th key={hIdx} className='text-white text-center' style={{ minWidth: '120px', backgroundColor: '#00338d', border: '1px solid #ffffff', fontSize: '12px', padding: '12px' }}>
                                 {header}
                               </th>
                             ))}
@@ -3030,11 +3030,7 @@ const DPRReport = () => {
                                 return (
                                   <td key={hIdx} className='text-end p-1'>
                                     {val !== null && val !== undefined ? (
-                                      header === '% Completion' ? (
-                                        Number(val).toFixed(2)
-                                      ) : (
-                                        useComma(val)
-                                      )
+                                      Number(val).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                     ) : ''}
                                   </td>
                                 );
@@ -3051,11 +3047,7 @@ const DPRReport = () => {
                                 return (
                                   <td key={hIdx} className='text-end'>
                                     {totalVal !== null && totalVal !== undefined ? (
-                                      header === '% Completion' ? (
-                                        Number(totalVal).toFixed(2)
-                                      ) : (
-                                        useComma(totalVal)
-                                      )
+                                      Number(totalVal).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                     ) : '-'}
                                   </td>
                                 );
