@@ -1779,6 +1779,8 @@ const DPRReport = () => {
   const [loadManpower, resultData] = useLoadManpowerMutation()
   const userData = useUser()
 
+  log(data, 'data')
+
   const load = () => {
     if (isValid(watch('date'))) {
       loadReport({
@@ -1952,9 +1954,9 @@ const DPRReport = () => {
             name: profile?.work_package,
             manpower: key
               ? re[key]?.data
-                  ?.filter((a) => a?.work_package === profile?.work_package)
-                  ?.map((a) => a?.manpower)
-                  .reduce((partialSum, a) => Number(partialSum) + Number(a), 0)
+                ?.filter((a) => a?.work_package === profile?.work_package)
+                ?.map((a) => a?.manpower)
+                .reduce((partialSum, a) => Number(partialSum) + Number(a), 0)
               : 0,
             key
           }
@@ -1963,9 +1965,9 @@ const DPRReport = () => {
             name: profile?.work_package,
             manpower: key
               ? re[key]?.data
-                  ?.filter((a) => a?.work_package === profile?.work_package)
-                  ?.map((a) => a?.manpower)
-                  .reduce((partialSum, a) => Number(partialSum) + Number(a), 0)
+                ?.filter((a) => a?.work_package === profile?.work_package)
+                ?.map((a) => a?.manpower)
+                .reduce((partialSum, a) => Number(partialSum) + Number(a), 0)
               : 0,
             key
           })
@@ -2922,347 +2924,160 @@ const DPRReport = () => {
             </Row>
           </Show>
 
-          {isSuccess && (
-            <Card>
-              <CardBody className='border-bottom'>
-                <ScrollBar>
-                  <div className='table-responsive'>
-                    <table className='table table-bordered text-center align-middle'>
-                      <thead>
-                        <tr className='text-black'>
-                          {/* <th>S No</th> */}
-                          <th>Area</th>
-                          <th>Description</th>
-                          <th>UOM</th>
-                          <th>Scope</th>
-                          <th>Cumulative Progress</th>
-                          <th>Total For DEC Month</th>
-                          <th>Upto Previous Month NOV 25</th>
-                          <th>% Completion</th>
-                          <th>Balance Qty</th>
-                          <th>TODAY</th>
-                          <th>REMARKS</th>
-                        </tr>
-                      </thead>
+          {isSuccess && isValidArray(data?.data) && data?.data?.map((sheet: any, sheetIndex: any) => {
+            const rows = sheet.rows || [];
+            const headers = sheet.headers || [];
+            const totals = sheet.totals || {};
 
-                 <tbody>
-  {(() => {
-    // ===== GRAND TOTAL ACCUMULATOR =====
-    const grandTotals = {
-      scope: 0,
-      cumulative: 0,
-      totalFor: 0,
-      prev: 0,
-      balance: 0,
-      today: 0
-    }
+            // Pre-calculate row spans for vendor and work_pack
+            const vendorSpans: any[] = [];
+            const workPackSpans: any[] = [];
 
-    return (
-      <>
-        {data?.data?.map((project) => (
-          <React.Fragment key={project?.id}>
-            {/* ===== PROJECT ROW ===== */}
-            <tr className="table-primary fw-bold">
-              <td colSpan={12} className="text-start">
-                {project?.name}
-              </td>
-            </tr>
+            let currentVendor = '';
+            let currentVendorCount = 0;
+            let currentWorkPack = '';
+            let currentWorkPackCount = 0;
 
-            {project?.configs?.map((config) => (
-              <React.Fragment key={config.id}>
-                {/* ===== ITEMS ===== */}
-                {config?.items?.map((item, index) => {
-                  const dpr = item.dprs?.[0]
-                  const sheet = parseSheet(dpr?.sheet_json_data)
+            rows.forEach((row: any, index: number) => {
+              // Vendor Span Logic
+              if (row.vendor !== currentVendor) {
+                if (currentVendorCount > 0) {
+                  vendorSpans[index - currentVendorCount] = currentVendorCount;
+                }
+                currentVendor = row.vendor;
+                currentVendorCount = 1;
+              } else {
+                currentVendorCount++;
+                vendorSpans[index] = 0;
+              }
 
-                  // ===== ADD INTO GRAND TOTAL (SILENT) =====
-                  grandTotals.scope += Number(sheet.Scope) || 0
-                  grandTotals.cumulative +=
-                    Number(sheet['Cumulative Progress']) || 0
-                  grandTotals.totalFor += Number(sheet['Total For']) || 0
-                  grandTotals.prev +=
-                    Number(sheet['Upto Previous Month']) || 0
-                  grandTotals.balance +=
-                    Number(sheet['Balance Qty']) || 0
-                  grandTotals.today += Number(sheet.TODAY) || 0
+              // Work Pack Span Logic (Nested within Vendor)
+              if (row.work_pack !== currentWorkPack || row.vendor !== currentVendor) {
+                if (currentWorkPackCount > 0) {
+                  workPackSpans[index - currentWorkPackCount] = currentWorkPackCount;
+                }
+                currentWorkPack = row.work_pack;
+                currentWorkPackCount = 1;
+              } else {
+                currentWorkPackCount++;
+                workPackSpans[index] = 0;
+              }
 
-                  return (
-                    <tr key={item.id}>
-                      {/* ===== Work Package name ONLY ONCE ===== */}
-                      {index === 0 && (
-                        <td
-                          rowSpan={config?.items?.length}
-                          className="fw-bold text-start"
-                        >
-                          {config.work_package?.name}
-                        </td>
-                      )}
-
-                      <td className="text-start">{item.title}</td>
-
-                      <td>{item.unit_of_measure ?? '-'}</td>
-
-                      <td>{sheet.Scope ?? 0}</td>
-
-                      <td>{sheet['Cumulative Progress'] ?? 0}</td>
-
-                      <td>{sheet['Total For'] ?? 0}</td>
-
-                      <td>{sheet['Upto Previous Month'] ?? 0}</td>
-
-                      <td>
-                        {Number.isFinite(sheet['% Completion'])
-                          ? Number(sheet['% Completion']).toFixed(2)
-                          : '0.00'}
-                      </td>
-
-                      <td
-                        className={
-                          sheet['Balance Qty'] < 0
-                            ? 'text-danger fw-bold'
-                            : ''
-                        }
-                      >
-                        {sheet['Balance Qty'] ?? 0}
-                      </td>
-
-                      <td>
-                        {Number.isFinite(sheet.TODAY) ? sheet.TODAY : 0}
-                      </td>
-
-                      <td>{sheet.REMARKS ?? '-'}</td>
-                    </tr>
-                  )
-                })}
-              </React.Fragment>
-            ))}
-          </React.Fragment>
-        ))}
-
-        {/* ===== GRAND TOTAL ROW (ONLY ONE) ===== */}
-        <tr className="table-primary fw-bold">
-          <td colSpan={3} className="text-start">
-            GRAND TOTAL 
-          </td>
-
-          <td>{grandTotals.scope.toLocaleString()}</td>
-
-          <td>{grandTotals.cumulative.toLocaleString()}</td>
-
-          <td>{grandTotals.totalFor.toLocaleString()}</td>
-
-          <td>{grandTotals.prev.toLocaleString()}</td>
-
-          <td>
-            {grandTotals.scope
-              ? (
-                  (grandTotals.cumulative / grandTotals.scope) *
-                  100
-                ).toFixed(2)
-              : '0.00'}
-          </td>
-
-          <td
-            className={
-              grandTotals.balance < 0 ? 'text-danger fw-bold' : ''
-            }
-          >
-            {grandTotals.balance.toLocaleString()}
-          </td>
-
-          <td>{grandTotals.today.toLocaleString()}</td>
-
-          <td>-</td>
-        </tr>
-      </>
-    )
-  })()}
-</tbody>
-
-                    </table>
-                  </div>
-                </ScrollBar>
-              </CardBody>
-            </Card>
-          )}
-
-          {dataArray?.map((item: any, index: any) => {
-            const itemData = item?.item_data || []
-            const uniqueKeys = new Set()
-
-            const fixedObj = {
-              Scope: 0,
-              'Drawing Released': 0,
-              'Front Available': 0,
-              'Work Done Till Date': 0,
-              'Plan FTM': 0,
-              'Achieved FTM': 0,
-
-              'Achieved FTD': 0,
-              '% Complete': 0,
-              Manpower: 0,
-              '% Achievement Against Plan': 0,
-              Productivity: 0,
-              'Asking Rate': 0,
-              Balance: 0
-            }
-
-            const objFromApi = isValid(itemData[0]?.data[0]) ? itemData[0]?.data[0] : {}
-
-            const obj = {
-              ...fixedObj,
-              ...objFromApi
-            }
-
-            Object.keys(obj).forEach((key) => {
-              uniqueKeys.add(key)
-            })
-            const tableHeaders1 = Array.from(uniqueKeys)
-            const tableHeaders = tableHeaders1
-
-            const sortedHeaders = tableHeaders
-              ?.filter((header: any, headerIndex) => {
-                const headersToKeep = [
-                  'original_csv',
-                  'project_name',
-                  'project_status',
-                  'vendor_name',
-                  'file_name',
-                  'is_dpr_submit',
-                  'is_this_month_submit',
-                  'Reporting Date',
-                  'Available Manpower'
-                ]
-                return !headersToKeep.includes(header)
-              })
-              ?.map((header: any, index: any) => fixHeaderPosition(header, index))
+              // Finalize for last row
+              if (index === rows.length - 1) {
+                vendorSpans[index - currentVendorCount + 1] = currentVendorCount;
+                workPackSpans[index - currentWorkPackCount + 1] = currentWorkPackCount;
+              }
+            });
 
             return (
-              <>
-                <Card>
-                  <CardBody className='border-bottom'>
-                    <ScrollBar>
-                      <Row md='12' className='d-flex justify-contents-between align-items-between'>
-                        <Col className=''>
-                          <h5 className='fw-bolder mb-1 text-capitalize'>
-                            {FM('work-item')} : {item?.work_item}
-                            {item?.unit_of_measure}
-                          </h5>
-                        </Col>
-                        <Col>
-                          <h5 className='fw-bolder text-end mb-1'>
-                            {FM('date')} : {item?.date}{' '}
-                          </h5>
-                        </Col>
-                      </Row>
-                      <Table bordered>
+              <Card key={sheet.sheet_id || sheetIndex} className='mb-3'>
+                <CardBody>
+                  <div className='d-flex justify-content-between align-items-center mb-1'>
+                    <h5 className='fw-bolder mb-0'>{sheet.sheet_name}</h5>
+                    <span className='text-muted small'>Sheet ID: {sheet.sheet_id}</span>
+                  </div>
+                  <ScrollBar>
+                    <div className='table-responsive'>
+                      <Table bordered size='sm' className='text-nowrap mb-0 align-middle custom-dpr-table'>
                         <thead>
-                          <tr>
-                            <th rowSpan={2}>{FM('project')}</th>
-                            {sortedHeaders?.map((header: any, index: any) => (
-                              <th key={index}>{header}</th>
-                            ))}
-                          </tr>
-                          <tr>
-                            {sortedHeaders?.map((header: any, index: any) => (
-                              <th key={index}>{renderFormula(index)}</th>
+                          <tr style={{ backgroundColor: '#00338d', color: 'white' }}>
+                            <th className='text-white text-center' style={{ minWidth: '150px', backgroundColor: '#00338d', borderColor: '#00338d' }}>Area</th>
+                            <th className='text-white text-center' style={{ minWidth: '150px', backgroundColor: '#00338d', borderColor: '#00338d' }}></th>
+                            <th className='text-white text-center' style={{ minWidth: '150px', backgroundColor: '#00338d', borderColor: '#00338d' }}>Description</th>
+                            <th className='text-white text-center' style={{ minWidth: '60px', backgroundColor: '#00338d', borderColor: '#00338d' }}>UOM</th>
+                            {headers.map((header: string, hIdx: number) => (
+                              <th key={hIdx} className='text-white text-center' style={{ minWidth: '100px', backgroundColor: '#00338d', borderColor: '#00338d' }}>
+                                {header}
+                              </th>
                             ))}
                           </tr>
                         </thead>
                         <tbody>
-                          {itemData?.map((itemD: any, itemIndex: any) => {
-                            return (
-                              <>
-                                <tr>
-                                  <td className='fw-bolder'>{itemD?.project_name}</td>
+                          {rows.map((row: any, rowIndex: number) => (
+                            <tr key={rowIndex}>
+                              {/* Vendor Column */}
+                              {vendorSpans[rowIndex] !== 0 && (
+                                <td
+                                  rowSpan={vendorSpans[rowIndex]}
+                                  className='fw-bolder align-middle border-end text-start p-1'
+                                  style={{ backgroundColor: '#fdfdfd' }}
+                                >
+                                  {row.vendor}
+                                </td>
+                              )}
 
-                                  {sortedHeaders?.map((header: any, headerIndex: any) => {
-                                    if (header === 'Change reason for plan ftm') {
-                                      return <>{null}</>
-                                    }
+                              {/* Work Pack Column */}
+                              {workPackSpans[rowIndex] !== 0 && (
+                                <td
+                                  rowSpan={workPackSpans[rowIndex]}
+                                  className='fw-bolder align-middle border-end text-start p-1'
+                                  style={{ backgroundColor: '#fdfdfd' }}
+                                >
+                                  {row.work_pack}
+                                </td>
+                              )}
 
-                                    return (
-                                      <th key={`${itemIndex}-${itemIndex}-${headerIndex}`}>
-                                        {header === '% Completed w.r.t. total scope' ||
-                                        header === '% Achievement Against Plan FTM'
-                                          ? commaFormatter(
-                                              dashValueWithFormula(
-                                                header,
-                                                itemD?.data,
+                              {/* Area (Description) Column */}
+                              <td className='text-start p-1'>{row.area}</td>
 
-                                                itemD
-                                              )
-                                            ) >= 0
-                                            ? renderWithPercentage(
-                                                commaFormatter(
-                                                  dashValueWithFormula(header, itemD?.data, itemD)
-                                                ),
-                                                header
-                                              )
-                                            : '-'
-                                          : commaFormatter(
-                                              dashValueWithFormula(header, itemD?.data, itemD)
-                                            )}
-                                      </th>
-                                    )
-                                  })}
-                                </tr>
+                              {/* UOM Column */}
+                              <td className='text-center p-1'>{row.uom}</td>
 
-                                {itemD.data?.map((data: any, dataIndex: any) => {})}
-                              </>
-                            )
-                          })}
-                          <tr>
-                            <td className='fw-bolder'>{FM('total')}</td>
-                            {sortedHeaders?.map((header: any, headerIndex: any) => {
-                              if (header === 'Change reason for plan ftm') {
-                                return <>{null}</>
-                              }
+                              {/* Dynamic Value Columns */}
+                              {headers.map((header: string, hIdx: number) => {
+                                const val = row.values[header];
+                                return (
+                                  <td key={hIdx} className='text-end p-1'>
+                                    {val !== null && val !== undefined ? (
+                                      header === '% Completion' ? (
+                                        Number(val).toFixed(2)
+                                      ) : (
+                                        useComma(val)
+                                      )
+                                    ) : ''}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
 
-                              const total = calculateAllTotal(
-                                header,
-                                itemData
-                                  .flat(Infinity)
-                                  ?.map((a: any) => a?.data)
-                                  .flat(Infinity)
-                              )
-                              const totalAskingRate = itemData?.reduce((sum, item) => {
-                                const rate = parseFloat(item.askingRate || 0)
-                                return sum + rate
-                              }, 0)
-
-                              const totalProductivity = itemData?.reduce((sum, item) => {
-                                const rate = parseFloat(item.productivity || 0)
-                                return sum + rate
-                              }, 0)
-
-                              const totalManpower = itemData?.reduce((sum, item) => {
-                                const rate = parseFloat(item.Manpower || 0)
-                                return sum + rate
-                              }, 0)
-
-                              return (
-                                <>
-                                  <th>
-                                    {header === '% Completed w.r.t. total scope' ||
-                                    header === '% Achievement Against Plan FTM'
-                                      ? commaFormatter(total) >= 0
-                                        ? renderWithPercentage(commaFormatter(total), header)
-                                        : '-'
-                                      : commaFormatter(total)}
-                                  </th>
-                                </>
-                              )
-                            })}
-                          </tr>
+                          {/* Totals Row */}
+                          {Object.keys(totals).length > 0 && (
+                            <tr className='fw-bolder' style={{ backgroundColor: '#7da7be', color: 'black' }}>
+                              <td colSpan={4} className='text-start'>Total</td>
+                              {headers.map((header: string, hIdx: number) => {
+                                const totalVal = totals[header];
+                                return (
+                                  <td key={hIdx} className='text-end'>
+                                    {totalVal !== null && totalVal !== undefined ? (
+                                      header === '% Completion' ? (
+                                        Number(totalVal).toFixed(2)
+                                      ) : (
+                                        useComma(totalVal)
+                                      )
+                                    ) : '-'}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          )}
                         </tbody>
                       </Table>
-                    </ScrollBar>
-                  </CardBody>
-                </Card>
-              </>
-            )
+                    </div>
+                  </ScrollBar>
+                </CardBody>
+              </Card>
+            );
           })}
+
+          {isSuccess && isValidArray(data?.data) && data?.data?.length === 0 && (
+            <Card>
+              <CardBody className='text-center p-5'>
+                <h5 className='text-muted'>No reports found for the selected criteria.</h5>
+              </CardBody>
+            </Card>
+          )}
 
           {/* {isSuccess && !isValidArray(data?.data) ? (
             <Card>
