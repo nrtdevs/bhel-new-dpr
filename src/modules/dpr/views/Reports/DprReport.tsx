@@ -2924,144 +2924,296 @@ const DPRReport = () => {
             </Row>
           </Show>
 
-          {isSuccess && isValidArray(data?.data) && data?.data?.map((sheet: any, sheetIndex: any) => {
-            const rows = sheet.rows || [];
-            const headers = sheet.headers || [];
-            const totals = sheet.totals || {};
+          {isSuccess &&
+            isValidArray(data?.data) &&
+            data?.data?.map((sheet: any, sheetIndex: any) => {
+              const rows = sheet.rows || []
+              const headers = sheet.headers || []
+              const totals = sheet.totals || {}
 
-            // Pre-calculate row spans for vendor and work_pack
-            const vendorSpans: any[] = [];
-            const workPackSpans: any[] = [];
+              // Pre-calculate row spans for vendor and work_pack
+              const vendorSpans: any[] = []
+              const workPackSpans: any[] = []
 
-            let currentVendor = '';
-            let currentVendorCount = 0;
-            let currentWorkPack = '';
-            let currentWorkPackCount = 0;
+              let currentVendor = ''
+              let currentVendorCount = 0
+              let currentWorkPack = ''
+              let currentWorkPackCount = 0
 
-            rows.forEach((row: any, index: number) => {
-              // Vendor Span Logic
-              if (row.vendor !== currentVendor) {
-                if (currentVendorCount > 0) {
-                  vendorSpans[index - currentVendorCount] = currentVendorCount;
+              rows.forEach((row: any, index: number) => {
+                // Vendor Span Logic
+                if (row.vendor !== currentVendor) {
+                  if (currentVendorCount > 0) {
+                    vendorSpans[index - currentVendorCount] = currentVendorCount
+                  }
+                  currentVendor = row.vendor
+                  currentVendorCount = 1
+                } else {
+                  currentVendorCount++
+                  vendorSpans[index] = 0
                 }
-                currentVendor = row.vendor;
-                currentVendorCount = 1;
-              } else {
-                currentVendorCount++;
-                vendorSpans[index] = 0;
-              }
 
-              // Work Pack Span Logic (Nested within Vendor)
-              if (row.work_pack !== currentWorkPack || row.vendor !== currentVendor) {
-                if (currentWorkPackCount > 0) {
-                  workPackSpans[index - currentWorkPackCount] = currentWorkPackCount;
+                // Work Pack Span Logic (Nested within Vendor)
+                if (row.work_pack !== currentWorkPack || row.vendor !== currentVendor) {
+                  if (currentWorkPackCount > 0) {
+                    workPackSpans[index - currentWorkPackCount] = currentWorkPackCount
+                  }
+                  currentWorkPack = row.work_pack
+                  currentWorkPackCount = 1
+                } else {
+                  currentWorkPackCount++
+                  workPackSpans[index] = 0
                 }
-                currentWorkPack = row.work_pack;
-                currentWorkPackCount = 1;
-              } else {
-                currentWorkPackCount++;
-                workPackSpans[index] = 0;
-              }
 
-              // Finalize for last row
-              if (index === rows.length - 1) {
-                vendorSpans[index - currentVendorCount + 1] = currentVendorCount;
-                workPackSpans[index - currentWorkPackCount + 1] = currentWorkPackCount;
-              }
-            });
+                // Finalize for last row
+                if (index === rows.length - 1) {
+                  vendorSpans[index - currentVendorCount + 1] = currentVendorCount
+                  workPackSpans[index - currentWorkPackCount + 1] = currentWorkPackCount
+                }
+              })
 
-            return (
-              <Card key={sheet.sheet_id || sheetIndex} className='mb-3'>
-                <CardBody>
-                  <div className='d-flex justify-content-between align-items-center mb-1'>
-                    <h5 className='fw-bolder mb-0'>{sheet.sheet_name}</h5>
-
-                  </div>
-                  <ScrollBar>
-                    <div className='table-responsive'>
-                      <Table bordered size='sm' className='text-nowrap mb-0 align-middle custom-dpr-table'>
-                        <thead>
-                          <tr style={{ backgroundColor: '#00338d', color: 'white' }}>
-                            <th className='text-white text-center' style={{ minWidth: '150px', backgroundColor: '#00338d', border: '1px solid #ffffff', fontSize: '12px', padding: '12px' }}>AREA</th>
-                            <th className='text-white text-center' style={{ minWidth: '150px', backgroundColor: '#00338d', border: '1px solid #ffffff', fontSize: '12px', padding: '12px' }}></th>
-                            <th className='text-white text-center' style={{ minWidth: '400px', backgroundColor: '#00338d', border: '1px solid #ffffff', fontSize: '12px', padding: '12px' }}>DESCRIPTION</th>
-                            <th className='text-white text-center' style={{ minWidth: '80px', backgroundColor: '#00338d', border: '1px solid #ffffff', fontSize: '12px', padding: '12px' }}>UOM</th>
-                            {headers.map((header: string, hIdx: number) => (
-                              <th key={hIdx} className='text-white text-center' style={{ minWidth: '120px', backgroundColor: '#00338d', border: '1px solid #ffffff', fontSize: '12px', padding: '12px' }}>
-                                {header}
+              return (
+                <Card key={sheet.sheet_id || sheetIndex} className='mb-3'>
+                  <CardBody>
+                    <div className='d-flex justify-content-between align-items-center mb-1'>
+                      <h5 className='fw-bolder mb-0'>{sheet?.sheet_name}</h5>
+                    </div>
+                    <ScrollBar>
+                      <div className='table-responsive'>
+                        <Table
+                          bordered
+                          size='sm'
+                          className='text-nowrap mb-0 align-middle custom-dpr-table'
+                        >
+                          <thead>
+                            <tr style={{ backgroundColor: '#00338d', color: 'white' }}>
+                              <Show IF={sheet?.type == 'euipment'}>
+                                <th
+                                  className='text-white text-center'
+                                  style={{
+                                    minWidth: '120px',
+                                    backgroundColor: '#00338d',
+                                    border: '1px solid #ffffff',
+                                    fontSize: '11px',
+                                    padding: '4px'
+                                  }}
+                                >
+                                  Sl. No.
+                                </th>
+                              </Show>
+                              <th
+                                className='text-white text-center'
+                                style={{
+                                  minWidth: '120px',
+                                  backgroundColor: '#00338d',
+                                  border: '1px solid #ffffff',
+                                  fontSize: '11px',
+                                  padding: '4px'
+                                }}
+                              >
+                                AREA
                               </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {rows.map((row: any, rowIndex: number) => (
-                            <tr key={rowIndex}>
-                              {/* Vendor Column */}
-                              {vendorSpans[rowIndex] !== 0 && (
-                                <td
-                                  rowSpan={vendorSpans[rowIndex]}
-                                  className='fw-bolder align-middle border-end text-start p-1'
-                                  style={{ backgroundColor: '#fdfdfd' }}
+                              {sheet?.sheet_name === 'Equipment_Sarpanch' ? <></> : <>   <th
+                                className='text-white text-center'
+                                style={{
+                                  minWidth: '120px',
+                                  backgroundColor: '#00338d',
+                                  border: '1px solid #ffffff',
+                                  fontSize: '11px',
+                                  padding: '4px'
+                                }}
+                              >
+                                VENDOR NAME
+                              </th></>}
+
+
+                              <Hide IF={sheet?.type == 'euipment'}>
+
+                                <th
+                                  className='text-white text-center'
+                                  style={{
+                                    minWidth: '120px',
+                                    backgroundColor: '#00338d',
+                                    border: '1px solid #ffffff',
+                                    fontSize: '11px',
+                                    padding: '4px'
+                                  }}
+                                ></th>
+
+                                <th
+                                  className='text-white text-center'
+                                  style={{
+                                    minWidth: '300px',
+                                    backgroundColor: '#00338d',
+                                    border: '1px solid #ffffff',
+                                    fontSize: '11px',
+                                    padding: '4px'
+                                  }}
                                 >
-                                  {row.vendor}
-                                </td>
-                              )}
+                                  DESCRIPTION
+                                </th>
+                              </Hide>
 
-                              {/* Work Pack Column */}
-                              {workPackSpans[rowIndex] !== 0 && (
-                                <td
-                                  rowSpan={workPackSpans[rowIndex]}
-                                  className='fw-bolder align-middle border-end text-start p-1'
-                                  style={{ backgroundColor: '#fdfdfd' }}
+
+                              <th
+                                className='text-white text-center'
+                                style={{
+                                  minWidth: '60px',
+                                  backgroundColor: '#00338d',
+                                  border: '1px solid #ffffff',
+                                  fontSize: '11px',
+                                  padding: '4px'
+                                }}
+                              >
+                                {sheet?.sheet_name === 'Equipment_Sarpanch' ? 'Capacity' : 'UOM'}
+                              </th>
+
+                              {headers.map((header: string, hIdx: number) => (
+                                <th
+                                  key={hIdx}
+                                  className='text-white text-center'
+                                  style={{
+                                    minWidth: '100px',
+                                    backgroundColor: '#00338d',
+                                    border: '1px solid #ffffff',
+                                    fontSize: '11px',
+                                    padding: '4px'
+                                  }}
                                 >
-                                  {row.work_pack}
-                                </td>
-                              )}
+                                  {header}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody style={{ fontSize: '11px' }}>
+                            {rows.map((row: any, rowIndex: number) => (
+                              <tr key={rowIndex}>
+                                {/* Vendor/Area Column */}
+                                <Show IF={sheet?.type == 'euipment'}>
+                                  {/* Sl. No. Column */}
+                                  <td className='text-start p-0 px-1'>{row.sno}</td>
+                                </Show>
 
-                              {/* Area (Description) Column */}
-                              <td className='text-start p-1'>{row.area}</td>
+                                <Hide IF={sheet?.type == 'euipment'}>
+                                  <>
+                                    {vendorSpans[rowIndex] !== 0 && (
+                                      <td
+                                        rowSpan={vendorSpans[rowIndex]}
+                                        className='align-middle border-end text-start p-0 px-1'
+                                        style={{ backgroundColor: '#fdfdfd', fontSize: '11px' }}
+                                      >
+                                        {row.vendor}
+                                      </td>
+                                    )}
+                                  </>
+                                </Hide>
 
-                              {/* UOM Column */}
-                              <td className='text-center p-1'>{row.uom}</td>
+                                <Show IF={sheet?.type == 'euipment'}>
+                                  {/* Area (Description) Column */}
+                                  <td className='text-start p-0 px-1'>{row.area}</td>
+                                </Show>
 
-                              {/* Dynamic Value Columns */}
-                              {headers.map((header: string, hIdx: number) => {
+                                {/* Vendor Name Column */}
+                                {sheet?.sheet_name === 'Equipment_Sarpanch' ? <></> : <>
+                                  <td className='text-start p-0 px-1 whitespace-pre-line'>
+                                    {row.Vendor_name}
+                                  </td>
+                                </>}
+
+                                <Hide IF={sheet?.type == 'euipment'}>
+                                  {/* Work Pack Column */}
+                                  <>
+                                    {workPackSpans[rowIndex] !== 0 && (
+                                      <td
+                                        rowSpan={workPackSpans[rowIndex]}
+                                        className='align-middle border-end text-start p-0 px-1'
+                                        style={{ backgroundColor: '#fdfdfd', fontSize: '11px' }}
+                                      >
+                                        {row.work_pack}
+                                      </td>
+                                    )}
+                                  </>
+                                  {/* Area (Description) Column */}
+                                  <td className='text-start p-0 px-1'>{row.area}</td>
+                                </Hide>
+
+                                {/* UOM Column */}
+                                <td className='text-center p-0 px-1'>{row.uom}</td>
+
+                                {/* Dynamic Value Columns */}
+                                {/* {headers.map((header: string, hIdx: number) => {
                                 const val = row.values[header];
                                 return (
-                                  <td key={hIdx} className='text-end p-1'>
+                                  <td key={hIdx} className='text-end p-0 px-1'>
                                     {val !== null && val !== undefined ? (
                                       Number(val).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                     ) : ''}
                                   </td>
                                 );
-                              })}
-                            </tr>
-                          ))}
+                              })} */}
 
-                          {/* Totals Row */}
-                          {Object.keys(totals).length > 0 && (
-                            <tr className='fw-bolder' style={{ backgroundColor: '#7da7be', color: 'black' }}>
-                              <td colSpan={4} className='text-start'>Total</td>
-                              {headers.map((header: string, hIdx: number) => {
-                                const totalVal = totals[header];
-                                return (
-                                  <td key={hIdx} className='text-end'>
-                                    {totalVal !== null && totalVal !== undefined ? (
-                                      Number(totalVal).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                    ) : '-'}
-                                  </td>
-                                );
-                              })}
-                            </tr>
-                          )}
-                        </tbody>
-                      </Table>
-                    </div>
-                  </ScrollBar>
-                </CardBody>
-              </Card>
-            );
-          })}
+                                {headers.map((header: string, hIdx: number) => {
+                                  const val = row.values?.[header]
+
+                                  let displayValue = ''
+
+                                  if (typeof val === 'number' && isFinite(val)) {
+                                    displayValue = val.toLocaleString('en-IN', {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2
+                                    })
+                                  } else if (typeof val === 'string') {
+                                    displayValue = val
+                                  }
+
+                                  return (
+                                    <td
+                                      key={hIdx}
+                                      className='text-center p-0 px-1 whitespace-pre-line'
+                                    >
+                                      {displayValue}
+                                    </td>
+                                  )
+                                })}
+                              </tr>
+                            ))}
+
+                            {/* Totals Row */}
+                            {Object.keys(totals).length > 0 && (
+                              <tr
+                                className='fw-bolder'
+                                style={{
+                                  backgroundColor: '#7da7be',
+                                  color: 'black',
+                                  fontSize: '11px'
+                                }}
+                              >
+                                <td colSpan={sheet?.type === 'euipment' ? 4 : 5} className='text-start p-0 px-1'>
+                                  Total
+                                </td>
+                                {headers.map((header: string, hIdx: number) => {
+                                  const totalVal = totals[header]
+                                  return (
+                                    <td key={hIdx} className='text-end p-0 px-1'>
+                                      {totalVal !== null && totalVal !== undefined
+                                        ? Number(totalVal).toLocaleString('en-IN', {
+                                          minimumFractionDigits: 2,
+                                          maximumFractionDigits: 2
+                                        })
+                                        : '-'}
+                                    </td>
+                                  )
+                                })}
+                              </tr>
+                            )}
+                          </tbody>
+                        </Table>
+                      </div>
+                    </ScrollBar>
+                  </CardBody>
+                </Card>
+              )
+            })}
 
           {isSuccess && isValidArray(data?.data) && data?.data?.length === 0 && (
             <Card>

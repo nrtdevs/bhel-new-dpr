@@ -165,12 +165,12 @@ function ReportsEmail() {
     if (resultEmailTrigger?.isSuccess) {
       emitAlertStatus('success', null, resultEmailTrigger?.originalArgs?.eventId)
       toast.success('Email Trigger SuccessFully')
-
-      //   setTriggerValue(false)
-      //   form.resetField('execution_time')
-      //   loadSetting({})
+    } else if (resultEmailTrigger?.error) {
+      emitAlertStatus('failed', null, resultEmailTrigger?.originalArgs?.eventId)
+      toast.error('Email Trigger Failed')
     }
   }, [resultEmailTrigger])
+  
   const columns: TableColumn<DPR>[] = [
     {
       name: '#',

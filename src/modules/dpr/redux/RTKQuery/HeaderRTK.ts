@@ -46,7 +46,7 @@ export const HeaderManagement = createApi({
     deleteHeaderById: builder.mutation<ResponseType, DPR>({
       query: ({ id }) => ({
         method: 'delete',
-        path: ApiEndpoints.headerAddUpdate + id
+        path: ApiEndpoints.headerAddUpdate + '/' + id
       })
     }),
     loadHeaderDetailsById: builder.mutation<ResponseType, DPR>({

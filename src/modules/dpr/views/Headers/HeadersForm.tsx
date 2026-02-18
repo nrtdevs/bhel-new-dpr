@@ -73,7 +73,8 @@ const HeadersForm = () => {
         if (isValid(getData) && getData !== undefined) {
             const f = fillObject<DPR>(state.formData, getData)
             const formData: DPR = {
-                ...f
+                ...f,
+                name: getData?.name
             }
             setValues<DPR>(formData, setValue)
         }
@@ -157,9 +158,9 @@ const HeadersForm = () => {
                                                     }}
                                                 />
                                             </Col>
-                                            
+
                                         </Row>
-                                    
+
                                         <Row className='d-flex justify-content-start'>
                                             <Col md='3'>
                                                 <LoadingButton

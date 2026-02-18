@@ -66,7 +66,7 @@ function ItemDescription() {
     useEffect(() => {
         loadItem({
             jsonData: {
-                name: isValid(state?.search) ? state.search : state?.filterData?.name,
+                title: isValid(state?.search) ? state.search : state?.filterData?.name,
                 ...state?.filterData
             },
             page: state?.page,

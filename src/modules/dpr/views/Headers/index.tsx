@@ -1,7 +1,7 @@
 /* eslint-disable no-mixed-operators */
 import { ThemeColors } from '@src/utility/context/ThemeColors'
 import { useContext, useEffect, useReducer } from 'react'
-import { Edit, List, MoreVertical, Plus, RefreshCcw } from 'react-feather'
+import { Edit, List, MoreVertical, Plus, RefreshCcw, Trash2 } from 'react-feather'
 import { useLocation } from 'react-router-dom'
 import { ButtonGroup } from 'reactstrap'
 
@@ -10,7 +10,7 @@ import CustomDataTable, {
 } from '@src/modules/common/components/CustomDataTable/CustomDataTable'
 import Header from '@src/modules/common/components/header'
 import { stateReducer } from '@src/utility/stateReducer'
-import { FM, isValid } from '@src/utility/Utils'
+import { FM, isValid, truncateText } from '@src/utility/Utils'
 
 import LoadingButton from '@src/modules/common/components/buttons/LoadingButton'
 import DropDownMenu from '@src/modules/common/components/dropdown'
@@ -23,6 +23,7 @@ import { DPR } from '@src/utility/types/typeDPR'
 import { emitAlertStatus, formatDate } from '@src/utility/Utils'
 import { TableColumn } from 'react-data-table-component'
 import { useDeleteHeaderByIdMutation, useLoadHeaderMutation } from '../../redux/RTKQuery/HeaderRTK'
+import ConfirmAlert from '@hooks/ConfirmAlert'
 
 interface States {
     page?: any
@@ -129,37 +130,59 @@ function Headers() {
                 <div className='d-flex align-items-center'>
                     <div className='user-info'>
                         <span className='d-block fw-bold'>{formatDate(row?.created_at, 'DD MMM YYYY')}</span>
-                    </div>                              
+                    </div>
                 </div>
             )
         },
 
-        // {
-        //     name: <>{FM('actions')}</>,
-        //     allowOverflow: true,
-        //     minWidth: "200px",
-        //     cell: (row) => {
-        //         return (
-        //             <div className='d-flex '>
-        //                 <DropDownMenu
-        //                     direction='up'
-        //                     component={<MoreVertical color={colors.primary.main} size={IconSizes.MenuVertical} />}
-        //                     options={[
-        //                         {
-        //                             IF: Permissions.itemDescriptionEdit,
-        //                             icon: <Edit size={14} />,
-        //                             state: row,
-        //                             to: {
-        //                                 pathname: getPath('dpr.headers.update', { id: row?.id })
-        //                             },
-        //                             name: FM('edit')
-        //                         }
-        //                     ]}
-        //                 />
-        //             </div>
-        //         )
-        //     }
-        // }
+        {
+            name: <>{FM('actions')}</>,
+            allowOverflow: true,
+            minWidth: "200px",
+            cell: (row) => {
+                return (
+                    <div className='d-flex '>
+                        <DropDownMenu
+                            direction='up'
+                            component={<MoreVertical color={colors.primary.main} size={IconSizes.MenuVertical} />}
+                            options={[
+                                {
+                                    IF: Permissions.sheetEdit,
+                                    icon: <Edit size={14} />,
+                                    state: row,
+                                    to: {
+                                        pathname: getPath('dpr.headers.update', { id: row?.id })
+                                    },
+                                    name: FM('edit')
+                                },
+                                {
+                                    // IF: Permissions.sheetDelete,
+                                    noWrap: true,
+                                    name: (
+                                        <ConfirmAlert
+                                            menuIcon={<Trash2 size={14} />}
+                                            onDropdown
+                                            eventId={`delete-item-${row?.id}`}
+                                            item={row}
+                                            title={truncateText(`${row?.name}`, 50)}
+                                            color='text-warning'
+                                            onClickYes={() => handleDelete(row?.id, `delete-item-${row?.id}`)}
+                                            onSuccessEvent={(e: any) => {
+                                                reloadData()
+                                            }}
+                                            className=''
+                                            id={`grid-delete-${row?.id}`}
+                                        >
+                                            {FM('delete')}
+                                        </ConfirmAlert>
+                                    )
+                                }
+                            ]}
+                        />
+                    </div>
+                )
+            }
+        }
     ]
 
     const handleSort = (column: any, dir: string) => {
