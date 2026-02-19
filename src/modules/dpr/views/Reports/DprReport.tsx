@@ -2831,107 +2831,107 @@ const DPRReport = () => {
                                         {FM('submit')}
                                     </Button> */}
                 </Col>
-                {/* <Show IF={isValidArray(data?.data)}> */}
-                <Show IF={watch('date')}>
-                  <Col md='3' className=''>
-                    <Button color='primary' block rounded onClick={pdf}>
-                      {loadingSample ? (
-                        <>
-                          <Spinner animation='border' size={'sm'}>
-                            <span className='visually-hidden'>Loading...</span>
-                          </Spinner>
-                        </>
-                      ) : (
-                        <>
-                          <Download size={14} /> {FM('download-pdf')}
-                        </>
-                      )}
-                    </Button>
-                  </Col>
-                  <Col md='3' className=''>
-                    <Button color='primary' block rounded onClick={excel}>
-                      {loadingExcel ? (
-                        <>
-                          <Spinner animation='border' size={'sm'}>
-                            <span className='visually-hidden'>Loading...</span>
-                          </Spinner>
-                        </>
-                      ) : (
-                        <>
-                          <Download size={14} /> {FM('download-excel')}
-                        </>
-                      )}
-                    </Button>
-                  </Col>
-                  <Col md='3' className=''>
-                    <Button color='primary' block rounded onClick={html}>
-                      {loadingHtml ? (
-                        <>
-                          <Spinner animation='border' size={'sm'}>
-                            <span className='visually-hidden'>Loading...</span>
-                          </Spinner>
-                        </>
-                      ) : (
-                        <>
-                          <Download size={14} /> {FM('download-html')}
-                        </>
-                      )}
-                    </Button>
-                  </Col>
-                  <Col md='12' className=''>
-                    <Row>
-                      <Col md='9'>
-                        <ReactMultiEmail
-                          // inputClassName=''
-                          placeholder='Enter your email'
-                          emails={dprReportEmails}
-                          onChange={(_emails: string[]) => {
-                            setDprReportsEmail(_emails)
-                          }}
-                          className='form-control'
-                          style={{
-                            minHeight: 25
-                          }}
-                          autoFocus={true}
-                          onFocus={() => setFocused(true)}
-                          onBlur={() => setFocused(false)}
-                          getLabel={(email, index, removeEmail) => {
-                            return (
-                              <div className='bg-light-primary fw-bold ' data-tag key={index}>
-                                <div data-tag-item className='m-20 p-20'>
-                                  <strong>{email}</strong>
+                <Show IF={isSuccess}>
+                  <Show IF={watch('date')}>
+                    <Col md='3' className=''>
+                      <Button color='primary' block rounded onClick={pdf}>
+                        {loadingSample || isLoading ? (
+                          <>
+                            <Spinner animation='border' size={'sm'}>
+                              <span className='visually-hidden'>Loading...</span>
+                            </Spinner>
+                          </>
+                        ) : (
+                          <>
+                            <Download size={14} /> {FM('download-pdf')}
+                          </>
+                        )}
+                      </Button>
+                    </Col>
+                    <Col md='3' className=''>
+                      <Button color='primary' block rounded onClick={excel}>
+                        {loadingExcel || isLoading ? (
+                          <>
+                            <Spinner animation='border' size={'sm'}>
+                              <span className='visually-hidden'>Loading...</span>
+                            </Spinner>
+                          </>
+                        ) : (
+                          <>
+                            <Download size={14} /> {FM('download-excel')}
+                          </>
+                        )}
+                      </Button>
+                    </Col>
+                    <Col md='3' className=''>
+                      <Button color='primary' block rounded onClick={html}>
+                        {loadingHtml || isLoading ? (
+                          <>
+                            <Spinner animation='border' size={'sm'}>
+                              <span className='visually-hidden'>Loading...</span>
+                            </Spinner>
+                          </>
+                        ) : (
+                          <>
+                            <Download size={14} /> {FM('download-html')}
+                          </>
+                        )}
+                      </Button>
+                    </Col>
+                    <Col md='12' className=''>
+                      <Row>
+                        <Col md='9'>
+                          <ReactMultiEmail
+                            // inputClassName=''
+                            placeholder='Enter your email'
+                            emails={dprReportEmails}
+                            onChange={(_emails: string[]) => {
+                              setDprReportsEmail(_emails)
+                            }}
+                            className='form-control'
+                            style={{
+                              minHeight: 25
+                            }}
+                            autoFocus={true}
+                            onFocus={() => setFocused(true)}
+                            onBlur={() => setFocused(false)}
+                            getLabel={(email, index, removeEmail) => {
+                              return (
+                                <div className='bg-light-primary fw-bold ' data-tag key={index}>
+                                  <div data-tag-item className='m-20 p-20'>
+                                    <strong>{email}</strong>
+                                  </div>
+                                  <span data-tag-handle onClick={() => removeEmail(index)}>
+                                    <XCircle height={15} />
+                                  </span>
                                 </div>
-                                <span data-tag-handle onClick={() => removeEmail(index)}>
-                                  <XCircle height={15} />
-                                </span>
-                              </div>
-                            )
-                          }}
-                        />
-                      </Col>
-                      <Col md='3'>
-                        <Button
-                          color='primary'
-                          className='mt-25'
-                          block
-                          rounded
-                          onClick={(e) => sendMail()}
-                        >
-                          {loadingMail ? (
-                            <>
-                              <Spinner animation='border' size={'sm'}>
-                                <span className='visually-hidden'>Loading...</span>
-                              </Spinner>
-                            </>
-                          ) : (
-                            <>{FM('send-email-pdf')}</>
-                          )}
-                        </Button>
-                      </Col>
-                    </Row>
-                  </Col>
+                              )
+                            }}
+                          />
+                        </Col>
+                        <Col md='3'>
+                          <Button
+                            color='primary'
+                            className='mt-25'
+                            block
+                            rounded
+                            onClick={(e) => sendMail()}
+                          >
+                            {loadingMail || isLoading ? (
+                              <>
+                                <Spinner animation='border' size={'sm'}>
+                                  <span className='visually-hidden'>Loading...</span>
+                                </Spinner>
+                              </>
+                            ) : (
+                              <>{FM('send-email-pdf')}</>
+                            )}
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Show>
                 </Show>
-                {/* </Show> */}
               </Row>
             </div>
           </CardHeader>
@@ -3194,33 +3194,38 @@ const DPRReport = () => {
                               ))}
 
                               {/* Totals Row */}
-                              {Object.keys(totals).length > 0 && (
-                                <tr
-                                  className='fw-bolder'
-                                  style={{
-                                    backgroundColor: '#7da7be',
-                                    color: 'black',
-                                    fontSize: '11px'
-                                  }}
-                                >
-                                  <td colSpan={sheet?.type === 'euipment' ? 4 : 5} className='text-start p-0 px-1'>
-                                    Total
-                                  </td>
-                                  {headers.map((header: string, hIdx: number) => {
-                                    const totalVal = totals[header]
-                                    return (
-                                      <td key={hIdx} className='text-center p-0 px-1'>
-                                        {totalVal !== null && totalVal !== undefined
-                                          ? Number(totalVal).toLocaleString('en-IN', {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                          })
-                                          : '-'}
-                                      </td>
-                                    )
-                                  })}
-                                </tr>
-                              )}
+                              {sheet?.type === 'euipment' ? <></> : <>
+
+                                {Object.keys(totals).length > 0 && (
+                                  <tr
+                                    className='fw-bolder'
+                                    style={{
+                                      backgroundColor: '#7da7be',
+                                      color: 'black',
+                                      fontSize: '11px'
+                                    }}
+                                  >
+                                    <td colSpan={sheet?.type === 'euipment' ? 3 : 5} className='text-end p-0 px-1'>
+                                      Total
+                                    </td>
+                                    {headers.map((header: string, hIdx: number) => {
+                                      const totalVal = totals[header]
+                                      return (
+                                        <td key={hIdx} className='text-center p-0 px-1'>
+                                          {totalVal !== null && totalVal !== undefined
+                                            ? Number(totalVal).toLocaleString('en-IN', {
+                                              minimumFractionDigits: 2,
+                                              maximumFractionDigits: 2
+                                            })
+                                            : '-'}
+                                        </td>
+                                      )
+                                    })}
+                                  </tr>
+                                )}
+
+                              </>}
+
                             </tbody>
                           </Table>
                         </div>
