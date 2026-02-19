@@ -2686,6 +2686,31 @@ const DPRReport = () => {
     }
   }
 
+  const sheets = (() => {
+    const rawData = data?.data
+    const result: any[] = []
+
+    if (Array.isArray(rawData)) {
+      result.push(...rawData)
+    } else if (rawData && typeof rawData === 'object') {
+      // Main Sheet
+      result.push({
+        ...rawData,
+        totals: rawData.grand_total,
+        type: 'main'
+      })
+
+      // Equipment Sheet
+      if (rawData.euipments) {
+        result.push({
+          ...rawData.euipments,
+          totals: rawData.euipments.grand_total
+        })
+      }
+    }
+    return result
+  })()
+
   return (
     <>
       <Header onClickBack={() => nav(-1)} goBackTo title={FM('dpr-report')}></Header>
@@ -2806,107 +2831,107 @@ const DPRReport = () => {
                                         {FM('submit')}
                                     </Button> */}
                 </Col>
-                <Show IF={isValidArray(data?.data)}>
-                  <Show IF={watch('date')}>
-                    <Col md='3' className=''>
-                      <Button color='primary' block rounded onClick={pdf}>
-                        {loadingSample ? (
-                          <>
-                            <Spinner animation='border' size={'sm'}>
-                              <span className='visually-hidden'>Loading...</span>
-                            </Spinner>
-                          </>
-                        ) : (
-                          <>
-                            <Download size={14} /> {FM('download-pdf')}
-                          </>
-                        )}
-                      </Button>
-                    </Col>
-                    <Col md='3' className=''>
-                      <Button color='primary' block rounded onClick={excel}>
-                        {loadingExcel ? (
-                          <>
-                            <Spinner animation='border' size={'sm'}>
-                              <span className='visually-hidden'>Loading...</span>
-                            </Spinner>
-                          </>
-                        ) : (
-                          <>
-                            <Download size={14} /> {FM('download-excel')}
-                          </>
-                        )}
-                      </Button>
-                    </Col>
-                    <Col md='3' className=''>
-                      <Button color='primary' block rounded onClick={html}>
-                        {loadingHtml ? (
-                          <>
-                            <Spinner animation='border' size={'sm'}>
-                              <span className='visually-hidden'>Loading...</span>
-                            </Spinner>
-                          </>
-                        ) : (
-                          <>
-                            <Download size={14} /> {FM('download-html')}
-                          </>
-                        )}
-                      </Button>
-                    </Col>
-                    <Col md='12' className=''>
-                      <Row>
-                        <Col md='9'>
-                          <ReactMultiEmail
-                            // inputClassName=''
-                            placeholder='Enter your email'
-                            emails={dprReportEmails}
-                            onChange={(_emails: string[]) => {
-                              setDprReportsEmail(_emails)
-                            }}
-                            className='form-control'
-                            style={{
-                              minHeight: 25
-                            }}
-                            autoFocus={true}
-                            onFocus={() => setFocused(true)}
-                            onBlur={() => setFocused(false)}
-                            getLabel={(email, index, removeEmail) => {
-                              return (
-                                <div className='bg-light-primary fw-bold ' data-tag key={index}>
-                                  <div data-tag-item className='m-20 p-20'>
-                                    <strong>{email}</strong>
-                                  </div>
-                                  <span data-tag-handle onClick={() => removeEmail(index)}>
-                                    <XCircle height={15} />
-                                  </span>
+                {/* <Show IF={isValidArray(data?.data)}> */}
+                <Show IF={watch('date')}>
+                  <Col md='3' className=''>
+                    <Button color='primary' block rounded onClick={pdf}>
+                      {loadingSample ? (
+                        <>
+                          <Spinner animation='border' size={'sm'}>
+                            <span className='visually-hidden'>Loading...</span>
+                          </Spinner>
+                        </>
+                      ) : (
+                        <>
+                          <Download size={14} /> {FM('download-pdf')}
+                        </>
+                      )}
+                    </Button>
+                  </Col>
+                  <Col md='3' className=''>
+                    <Button color='primary' block rounded onClick={excel}>
+                      {loadingExcel ? (
+                        <>
+                          <Spinner animation='border' size={'sm'}>
+                            <span className='visually-hidden'>Loading...</span>
+                          </Spinner>
+                        </>
+                      ) : (
+                        <>
+                          <Download size={14} /> {FM('download-excel')}
+                        </>
+                      )}
+                    </Button>
+                  </Col>
+                  <Col md='3' className=''>
+                    <Button color='primary' block rounded onClick={html}>
+                      {loadingHtml ? (
+                        <>
+                          <Spinner animation='border' size={'sm'}>
+                            <span className='visually-hidden'>Loading...</span>
+                          </Spinner>
+                        </>
+                      ) : (
+                        <>
+                          <Download size={14} /> {FM('download-html')}
+                        </>
+                      )}
+                    </Button>
+                  </Col>
+                  <Col md='12' className=''>
+                    <Row>
+                      <Col md='9'>
+                        <ReactMultiEmail
+                          // inputClassName=''
+                          placeholder='Enter your email'
+                          emails={dprReportEmails}
+                          onChange={(_emails: string[]) => {
+                            setDprReportsEmail(_emails)
+                          }}
+                          className='form-control'
+                          style={{
+                            minHeight: 25
+                          }}
+                          autoFocus={true}
+                          onFocus={() => setFocused(true)}
+                          onBlur={() => setFocused(false)}
+                          getLabel={(email, index, removeEmail) => {
+                            return (
+                              <div className='bg-light-primary fw-bold ' data-tag key={index}>
+                                <div data-tag-item className='m-20 p-20'>
+                                  <strong>{email}</strong>
                                 </div>
-                              )
-                            }}
-                          />
-                        </Col>
-                        <Col md='3'>
-                          <Button
-                            color='primary'
-                            className='mt-25'
-                            block
-                            rounded
-                            onClick={(e) => sendMail()}
-                          >
-                            {loadingMail ? (
-                              <>
-                                <Spinner animation='border' size={'sm'}>
-                                  <span className='visually-hidden'>Loading...</span>
-                                </Spinner>
-                              </>
-                            ) : (
-                              <>{FM('send-email-pdf')}</>
-                            )}
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Show>
+                                <span data-tag-handle onClick={() => removeEmail(index)}>
+                                  <XCircle height={15} />
+                                </span>
+                              </div>
+                            )
+                          }}
+                        />
+                      </Col>
+                      <Col md='3'>
+                        <Button
+                          color='primary'
+                          className='mt-25'
+                          block
+                          rounded
+                          onClick={(e) => sendMail()}
+                        >
+                          {loadingMail ? (
+                            <>
+                              <Spinner animation='border' size={'sm'}>
+                                <span className='visually-hidden'>Loading...</span>
+                              </Spinner>
+                            </>
+                          ) : (
+                            <>{FM('send-email-pdf')}</>
+                          )}
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Col>
                 </Show>
+                {/* </Show> */}
               </Row>
             </div>
           </CardHeader>
@@ -2924,349 +2949,302 @@ const DPRReport = () => {
             </Row>
           </Show>
 
-          {isSuccess &&
-            isValidArray(data?.data) &&
-            data?.data?.map((sheet: any, sheetIndex: any) => {
-              const rows = sheet.rows || []
-              const headers = sheet.headers || []
-              const totals = sheet.totals || {}
+          {isSuccess && isValidArray(sheets) ? (
+            <>
+              {sheets?.map((sheet: any, sheetIndex: any) => {
+                const rows = sheet.rows || []
+                const headers = sheet.headers || []
+                const totals = sheet.totals || {}
 
-              // Pre-calculate row spans for vendor and work_pack
-              const vendorSpans: any[] = []
-              const workPackSpans: any[] = []
+                // Pre-calculate row spans for vendor and work_pack
+                const vendorSpans: any[] = []
+                const workPackSpans: any[] = []
 
-              let currentVendor = ''
-              let currentVendorCount = 0
-              let currentWorkPack = ''
-              let currentWorkPackCount = 0
+                let currentVendor = ''
+                let currentVendorCount = 0
+                let currentWorkPack = ''
+                let currentWorkPackCount = 0
 
-              rows.forEach((row: any, index: number) => {
-                // Vendor Span Logic
-                if (row.vendor !== currentVendor) {
-                  if (currentVendorCount > 0) {
-                    vendorSpans[index - currentVendorCount] = currentVendorCount
+                rows.forEach((row: any, index: number) => {
+                  // Vendor Span Logic
+                  if (row.vendor !== currentVendor) {
+                    if (currentVendorCount > 0) {
+                      vendorSpans[index - currentVendorCount] = currentVendorCount
+                    }
+                    currentVendor = row.vendor
+                    currentVendorCount = 1
+                  } else {
+                    currentVendorCount++
+                    vendorSpans[index] = 0
                   }
-                  currentVendor = row.vendor
-                  currentVendorCount = 1
-                } else {
-                  currentVendorCount++
-                  vendorSpans[index] = 0
-                }
 
-                // Work Pack Span Logic (Nested within Vendor)
-                if (row.work_pack !== currentWorkPack || row.vendor !== currentVendor) {
-                  if (currentWorkPackCount > 0) {
-                    workPackSpans[index - currentWorkPackCount] = currentWorkPackCount
+                  // Work Pack Span Logic (Nested within Vendor)
+                  if (row.work_pack !== currentWorkPack || row.vendor !== currentVendor) {
+                    if (currentWorkPackCount > 0) {
+                      workPackSpans[index - currentWorkPackCount] = currentWorkPackCount
+                    }
+                    currentWorkPack = row.work_pack
+                    currentWorkPackCount = 1
+                  } else {
+                    currentWorkPackCount++
+                    workPackSpans[index] = 0
                   }
-                  currentWorkPack = row.work_pack
-                  currentWorkPackCount = 1
-                } else {
-                  currentWorkPackCount++
-                  workPackSpans[index] = 0
-                }
 
-                // Finalize for last row
-                if (index === rows.length - 1) {
-                  vendorSpans[index - currentVendorCount + 1] = currentVendorCount
-                  workPackSpans[index - currentWorkPackCount + 1] = currentWorkPackCount
-                }
-              })
+                  // Finalize for last row
+                  if (index === rows.length - 1) {
+                    vendorSpans[index - currentVendorCount + 1] = currentVendorCount
+                    workPackSpans[index - currentWorkPackCount + 1] = currentWorkPackCount
+                  }
+                })
 
-              return (
-                <Card key={sheet.sheet_id || sheetIndex} className='mb-3'>
-                  <CardBody>
-                    <div className='d-flex justify-content-between align-items-center mb-1'>
-                      <h5 className='fw-bolder mb-0'>{sheet?.sheet_name}</h5>
-                    </div>
-                    <ScrollBar>
-                      <div className='table-responsive'>
-                        <Table
-                          bordered
-                          size='sm'
-                          className='text-nowrap mb-0 align-middle custom-dpr-table'
-                        >
-                          <thead>
-                            <tr style={{ backgroundColor: '#00338d', color: 'white' }}>
-                              <Show IF={sheet?.type == 'euipment'}>
-                                <th
-                                  className='text-white text-center'
-                                  style={{
-                                    minWidth: '120px',
-                                    backgroundColor: '#00338d',
-                                    border: '1px solid #ffffff',
-                                    fontSize: '11px',
-                                    padding: '4px'
-                                  }}
-                                >
-                                  Sl. No.
-                                </th>
-                              </Show>
-                              <th
-                                className='text-white text-center'
-                                style={{
-                                  minWidth: '120px',
-                                  backgroundColor: '#00338d',
-                                  border: '1px solid #ffffff',
-                                  fontSize: '11px',
-                                  padding: '4px'
-                                }}
-                              >
-                                AREA
-                              </th>
-                              {sheet?.sheet_name === 'Equipment_Sarpanch' ? <></> : <>   <th
-                                className='text-white text-center'
-                                style={{
-                                  minWidth: '120px',
-                                  backgroundColor: '#00338d',
-                                  border: '1px solid #ffffff',
-                                  fontSize: '11px',
-                                  padding: '4px'
-                                }}
-                              >
-                                VENDOR NAME
-                              </th></>}
-
-
-                              <Hide IF={sheet?.type == 'euipment'}>
-
-                                <th
-                                  className='text-white text-center'
-                                  style={{
-                                    minWidth: '120px',
-                                    backgroundColor: '#00338d',
-                                    border: '1px solid #ffffff',
-                                    fontSize: '11px',
-                                    padding: '4px'
-                                  }}
-                                ></th>
-
-                                <th
-                                  className='text-white text-center'
-                                  style={{
-                                    minWidth: '300px',
-                                    backgroundColor: '#00338d',
-                                    border: '1px solid #ffffff',
-                                    fontSize: '11px',
-                                    padding: '4px'
-                                  }}
-                                >
-                                  DESCRIPTION
-                                </th>
-                              </Hide>
-
-
-                              <th
-                                className='text-white text-center'
-                                style={{
-                                  minWidth: '60px',
-                                  backgroundColor: '#00338d',
-                                  border: '1px solid #ffffff',
-                                  fontSize: '11px',
-                                  padding: '4px'
-                                }}
-                              >
-                                {sheet?.sheet_name === 'Equipment_Sarpanch' ? 'Capacity' : 'UOM'}
-                              </th>
-
-                              {headers.map((header: string, hIdx: number) => (
-                                <th
-                                  key={hIdx}
-                                  className='text-white text-center'
-                                  style={{
-                                    minWidth: '100px',
-                                    backgroundColor: '#00338d',
-                                    border: '1px solid #ffffff',
-                                    fontSize: '11px',
-                                    padding: '4px'
-                                  }}
-                                >
-                                  {header}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody style={{ fontSize: '11px' }}>
-                            {rows.map((row: any, rowIndex: number) => (
-                              <tr key={rowIndex}>
-                                {/* Vendor/Area Column */}
-                                <Show IF={sheet?.type == 'euipment'}>
-                                  {/* Sl. No. Column */}
-                                  <td className='text-start p-0 px-1'>{row.sno}</td>
-                                </Show>
-
-                                <Hide IF={sheet?.type == 'euipment'}>
-                                  <>
-                                    {vendorSpans[rowIndex] !== 0 && (
-                                      <td
-                                        rowSpan={vendorSpans[rowIndex]}
-                                        className='align-middle border-end text-start p-0 px-1'
-                                        style={{ backgroundColor: '#fdfdfd', fontSize: '11px' }}
-                                      >
-                                        {row.vendor}
-                                      </td>
-                                    )}
-                                  </>
-                                </Hide>
-
-                                <Show IF={sheet?.type == 'euipment'}>
-                                  {/* Area (Description) Column */}
-                                  <td className='text-start p-0 px-1'>{row.area}</td>
-                                </Show>
-
-                                {/* Vendor Name Column */}
-                                {sheet?.sheet_name === 'Equipment_Sarpanch' ? <></> : <>
-                                  <td className='text-start p-0 px-1 whitespace-pre-line'>
-                                    {row.Vendor_name}
-                                  </td>
-                                </>}
-
-                                <Hide IF={sheet?.type == 'euipment'}>
-                                  {/* Work Pack Column */}
-                                  <>
-                                    {workPackSpans[rowIndex] !== 0 && (
-                                      <td
-                                        rowSpan={workPackSpans[rowIndex]}
-                                        className='align-middle border-end text-start p-0 px-1'
-                                        style={{ backgroundColor: '#fdfdfd', fontSize: '11px' }}
-                                      >
-                                        {row.work_pack}
-                                      </td>
-                                    )}
-                                  </>
-                                  {/* Area (Description) Column */}
-                                  <td className='text-start p-0 px-1'>{row.area}</td>
-                                </Hide>
-
-                                {/* UOM Column */}
-                                <td className='text-center p-0 px-1'>{row.uom}</td>
-
-                                {/* Dynamic Value Columns */}
-                                {/* {headers.map((header: string, hIdx: number) => {
-                                const val = row.values[header];
-                                return (
-                                  <td key={hIdx} className='text-end p-0 px-1'>
-                                    {val !== null && val !== undefined ? (
-                                      Number(val).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                    ) : ''}
-                                  </td>
-                                );
-                              })} */}
-
-                                {headers.map((header: string, hIdx: number) => {
-                                  const val = row.values?.[header]
-
-                                  let displayValue = ''
-
-                                  if (typeof val === 'number' && isFinite(val)) {
-                                    displayValue = val.toLocaleString('en-IN', {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2
-                                    })
-                                  } else if (typeof val === 'string') {
-                                    displayValue = val
-                                  }
-
-                                  return (
-                                    <td
-                                      key={hIdx}
-                                      className='text-center p-0 px-1 whitespace-pre-line'
-                                    >
-                                      {displayValue}
-                                    </td>
-                                  )
-                                })}
-                              </tr>
-                            ))}
-
-                            {/* Totals Row */}
-                            {Object.keys(totals).length > 0 && (
-                              <tr
-                                className='fw-bolder'
-                                style={{
-                                  backgroundColor: '#7da7be',
-                                  color: 'black',
-                                  fontSize: '11px'
-                                }}
-                              >
-                                <td colSpan={sheet?.type === 'euipment' ? 4 : 5} className='text-start p-0 px-1'>
-                                  Total
-                                </td>
-                                {headers.map((header: string, hIdx: number) => {
-                                  const totalVal = totals[header]
-                                  return (
-                                    <td key={hIdx} className='text-end p-0 px-1'>
-                                      {totalVal !== null && totalVal !== undefined
-                                        ? Number(totalVal).toLocaleString('en-IN', {
-                                          minimumFractionDigits: 2,
-                                          maximumFractionDigits: 2
-                                        })
-                                        : '-'}
-                                    </td>
-                                  )
-                                })}
-                              </tr>
-                            )}
-                          </tbody>
-                        </Table>
+                return (
+                  <Card key={sheet.sheet_id || sheetIndex} className='mb-3'>
+                    <CardBody>
+                      <div className='d-flex justify-content-between align-items-center mb-1'>
+                        <h5 className='fw-bolder mb-0'>{sheet?.sheet_name}</h5>
                       </div>
-                    </ScrollBar>
-                  </CardBody>
-                </Card>
-              )
-            })}
+                      <ScrollBar>
+                        <div className='table-responsive'>
+                          <Table
+                            bordered
+                            size='sm'
+                            className='text-nowrap mb-0 align-middle custom-dpr-table'
+                          >
+                            <thead>
+                              <tr style={{ backgroundColor: '#00338d', color: 'white' }}>
+                                <Show IF={sheet?.type == 'euipment'}>
+                                  <th
+                                    className='text-white text-center'
+                                    style={{
+                                      minWidth: '120px',
+                                      backgroundColor: '#00338d',
+                                      border: '1px solid #ffffff',
+                                      fontSize: '11px',
+                                      padding: '4px'
+                                    }}
+                                  >
+                                    Sl. No.
+                                  </th>
+                                </Show>
+                                <th
+                                  className='text-white text-center'
+                                  style={{
+                                    minWidth: '120px',
+                                    backgroundColor: '#00338d',
+                                    border: '1px solid #ffffff',
+                                    fontSize: '11px',
+                                    padding: '4px'
+                                  }}
+                                >
+                                  AREA
+                                </th>
+                                {sheet?.type === 'euipment' ? <></> : <>   <th
+                                  className='text-white text-center'
+                                  style={{
+                                    minWidth: '120px',
+                                    backgroundColor: '#00338d',
+                                    border: '1px solid #ffffff',
+                                    fontSize: '11px',
+                                    padding: '4px'
+                                  }}
+                                >
+                                  VENDOR NAME
+                                </th></>}
 
-          {isSuccess && isValidArray(data?.data) && data?.data?.length === 0 && (
+
+                                <Hide IF={sheet?.type == 'euipment'}>
+
+                                  <th
+                                    className='text-white text-center'
+                                    style={{
+                                      minWidth: '120px',
+                                      backgroundColor: '#00338d',
+                                      border: '1px solid #ffffff',
+                                      fontSize: '11px',
+                                      padding: '4px'
+                                    }}
+                                  ></th>
+
+                                  <th
+                                    className='text-white text-center'
+                                    style={{
+                                      minWidth: '300px',
+                                      backgroundColor: '#00338d',
+                                      border: '1px solid #ffffff',
+                                      fontSize: '11px',
+                                      padding: '4px'
+                                    }}
+                                  >
+                                    DESCRIPTION
+                                  </th>
+                                </Hide>
+
+
+                                <th
+                                  className='text-white text-center'
+                                  style={{
+                                    minWidth: '60px',
+                                    backgroundColor: '#00338d',
+                                    border: '1px solid #ffffff',
+                                    fontSize: '11px',
+                                    padding: '4px'
+                                  }}
+                                >
+                                  {sheet?.type === 'euipment' ? 'Capacity' : 'UOM'}
+                                </th>
+
+                                {headers.map((header: string, hIdx: number) => (
+                                  <th
+                                    key={hIdx}
+                                    className='text-white text-center'
+                                    style={{
+                                      minWidth: '100px',
+                                      backgroundColor: '#00338d',
+                                      border: '1px solid #ffffff',
+                                      fontSize: '11px',
+                                      padding: '4px'
+                                    }}
+                                  >
+                                    {header}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody style={{ fontSize: '11px' }}>
+                              {rows.map((row: any, rowIndex: number) => (
+                                <tr key={rowIndex}>
+                                  {/* Vendor/Area Column */}
+                                  <Show IF={sheet?.type == 'euipment'}>
+                                    {/* Sl. No. Column */}
+                                    <td className='text-start p-0 px-1'>{row.sno}</td>
+                                  </Show>
+
+                                  <Hide IF={sheet?.type == 'euipment'}>
+                                    <>
+                                      {vendorSpans[rowIndex] !== 0 && (
+                                        <td
+                                          rowSpan={vendorSpans[rowIndex]}
+                                          className='align-middle border-end text-start p-0 px-1'
+                                          style={{ backgroundColor: '#fdfdfd', fontSize: '11px' }}
+                                        >
+                                          {row.vendor}
+                                        </td>
+                                      )}
+                                    </>
+                                  </Hide>
+
+                                  <Show IF={sheet?.type == 'euipment'}>
+                                    {/* Area (Description) Column */}
+                                    <td className='text-start p-0 px-1'>{row.area}</td>
+                                  </Show>
+
+                                  {/* Vendor Name Column */}
+                                  {sheet?.type === 'euipment' ? <></> : <>
+                                    <td className='text-start p-0 px-1 whitespace-pre-line'>
+                                      {row.Vendor_name}
+                                    </td>
+                                  </>}
+
+                                  <Hide IF={sheet?.type == 'euipment'}>
+                                    {/* Work Pack Column */}
+                                    <>
+                                      {workPackSpans[rowIndex] !== 0 && (
+                                        <td
+                                          rowSpan={workPackSpans[rowIndex]}
+                                          className='align-middle border-end text-start p-0 px-1'
+                                          style={{ backgroundColor: '#fdfdfd', fontSize: '11px' }}
+                                        >
+                                          {row.work_pack}
+                                        </td>
+                                      )}
+                                    </>
+                                    {/* Area (Description) Column */}
+                                    <td className='text-start p-0 px-1'>{row.area}</td>
+                                  </Hide>
+
+                                  {/* UOM Column */}
+                                  <td className='text-center p-0 px-1'>{row.uom}</td>
+
+
+
+                                  {headers.map((header: string, hIdx: number) => {
+                                    const val = row.values?.[header]
+
+                                    let displayValue = ''
+
+                                    if (typeof val === 'number' && isFinite(val)) {
+                                      displayValue = val.toLocaleString('en-IN', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                      })
+                                    } else if (typeof val === 'string') {
+                                      displayValue = val
+                                    }
+
+                                    return (
+                                      <td
+                                        key={hIdx}
+                                        className='text-center p-0 px-1 whitespace-pre-line'
+                                      >
+                                        {displayValue}
+                                      </td>
+                                    )
+                                  })}
+                                </tr>
+                              ))}
+
+                              {/* Totals Row */}
+                              {Object.keys(totals).length > 0 && (
+                                <tr
+                                  className='fw-bolder'
+                                  style={{
+                                    backgroundColor: '#7da7be',
+                                    color: 'black',
+                                    fontSize: '11px'
+                                  }}
+                                >
+                                  <td colSpan={sheet?.type === 'euipment' ? 4 : 5} className='text-start p-0 px-1'>
+                                    Total
+                                  </td>
+                                  {headers.map((header: string, hIdx: number) => {
+                                    const totalVal = totals[header]
+                                    return (
+                                      <td key={hIdx} className='text-center p-0 px-1'>
+                                        {totalVal !== null && totalVal !== undefined
+                                          ? Number(totalVal).toLocaleString('en-IN', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                          })
+                                          : '-'}
+                                      </td>
+                                    )
+                                  })}
+                                </tr>
+                              )}
+                            </tbody>
+                          </Table>
+                        </div>
+                      </ScrollBar>
+                    </CardBody>
+                  </Card>
+                )
+              })}
+            </>
+          ) : (
+            <></>
+          )}
+
+          {isSuccess && !isValidArray(sheets) ? (
             <Card>
               <CardBody className='text-center p-5'>
                 <h5 className='text-muted'>No reports found for the selected criteria.</h5>
               </CardBody>
             </Card>
-          )}
+          ) : <></>}
 
-          {/* {isSuccess && !isValidArray(data?.data) ? (
-            <Card>
-              <CardBody className=''>
-                <Row className='px-2 fw-bolder'>
-                  There are no records to display. Please select the correct Date.
-                </Row>
-              </CardBody>
-            </Card>
-          ) : (
-            ''
-          )} */}
-          {/* <Show IF={isValidArray(resultData?.data?.data)}>
-            <Card>
-              <CardBody className='pb-0 border-bottom mb-2 pt-1'>
-                <Row md='12' className='d-flex justify-contents-between align-items-between'>
-                  <Col className=''>
-                    <h5 className='fw-bolder mb-1'>{FM('manpower-table')}</h5>
-                  </Col>
-                  <Col>
-                    <h5 className='fw-bolder text-end mb-1'>
-                      {FM('data-date')} : {formatDate(watch('date'), 'DD MMM YYYY')}{' '}
-                    </h5>
-                  </Col>
-                </Row>
-              </CardBody>
-              <CardBody className='border-bottom pt-0'>
-                <ScrollBar>
-                  <Table>
-                    <thead>
-                      <tr>
-                        <th>{FM('project')}</th>
-                        {getWorkPackage().map((workPackage, index) => {
-                          return <th>{workPackage?.name}</th>
-                        })}
-                      </tr>
-                    </thead>
-                    <tbody>{renderTrTd()}</tbody>
-                  </Table>
-                </ScrollBar>
-              </CardBody>
-            </Card>
-          </Show> */}
+
         </Show>
-      </Form>
+      </Form >
     </>
   )
 }
