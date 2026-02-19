@@ -73,6 +73,13 @@ export const ConfigManagement = createApi({
         method: 'post',
         path: ApiEndpoints?.dpr_import_all_projects
       })
+    }),
+    importItemDescrptionAll: builder.mutation<ResponseTypeList, any>({
+      query: (formData) => ({
+        formData,
+        method: 'post',
+        path: ApiEndpoints?.import_item_desc
+      })
     })
   })
 })
@@ -82,5 +89,6 @@ export const {
   useDeleteConfigByIdMutation,
   useLoadConfigDetailsByIdMutation,
   useLoadConfigActionMutation,
-  useImportDprImportAllProjectsMutation
+  useImportDprImportAllProjectsMutation,
+  useImportItemDescrptionAllMutation
 } = ConfigManagement

@@ -195,66 +195,66 @@ const DPRTable = () => {
   //   moveTo()
   // }, [state?.id, state?.profile_name])
 
-  // const onSubmitData = async (d: any) => {
-  //   log(d)
-  //   if (isValidArray(d?.file)) {
-  //     if (hasExtension(d.file[0]?.name, ['.xlsx', '.xls', '.csv'])) {
-  //       importDPR({
-  //         file: d?.file[0],
-  //         sheet_name: d?.sheet_name
-  //       })
-  //     } else {
-  //       // setError('file', { type: 'custom' })
-  //     }
-  //   } else {
-  //     //   setError('file', { type: 'custom' })
-  //   }
-  //   // const subData = {
-  //   //   automation_email_trigger: triggerValue,
-  //   //   execution_time: data?.execution_time
-  //   // }
-  //   // try {
-  //   //   setLoading(true) // 👈 start loader
-  //   //   const response = await updateEmail(subData) // 👈 wait for API
-  //   //   // agar success aaya
-  //   //   //   console.log('✅ API Success:', response)
-  //   // } catch (error) {
-  //   //   //   console.error('❌ API Error:', error)
-  //   // } finally {
-  //   //   setLoading(false) // 👈 stop loader always
-  //   // }
-  // }
+  const onSubmitData = async (d: any) => {
+    log(d)
+    if (isValidArray(d?.file)) {
+      if (hasExtension(d.file[0]?.name, ['.xlsx', '.xls', '.csv'])) {
+        importDPR({
+          file: d?.file[0],
+          sheet_name: d?.sheet_name
+        })
+      } else {
+        // setError('file', { type: 'custom' })
+      }
+    } else {
+      //   setError('file', { type: 'custom' })
+    }
+    // const subData = {
+    //   automation_email_trigger: triggerValue,
+    //   execution_time: data?.execution_time
+    // }
+    // try {
+    //   setLoading(true) // 👈 start loader
+    //   const response = await updateEmail(subData) // 👈 wait for API
+    //   // agar success aaya
+    //   //   console.log('✅ API Success:', response)
+    // } catch (error) {
+    //   //   console.error('❌ API Error:', error)
+    // } finally {
+    //   setLoading(false) // 👈 stop loader always
+    // }
+  }
 
 
   //handlesubmit
- const onSubmitData = async (d: any) => {
-  if (!isValidArray(d?.file)) return
+  // const onSubmitData = async (d: any) => {
+  //   if (!isValidArray(d?.file)) return
 
-  if (!hasExtension(d.file[0]?.name, ['.xlsx', '.xls', '.csv'])) return
+  //   if (!hasExtension(d.file[0]?.name, ['.xlsx', '.xls', '.csv'])) return
 
-  // ✅ TagsInput gives string[]
-  const sheetNameString =
-    d?.all_sheet === 1
-      ? ''
-      : Array.isArray(d?.sheet_name)
-          ? d.sheet_name
-              .map((v: string) => v.trim())
-              .filter(Boolean)
-              .join(', ')
-          : ''
+  //   // ✅ TagsInput gives string[]
+  //   const sheetNameString =
+  //     d?.all_sheet === 1
+  //       ? ''
+  //       : Array.isArray(d?.sheet_name)
+  //         ? d.sheet_name
+  //           .map((v: string) => v.trim())
+  //           .filter(Boolean)
+  //           .join(', ')
+  //         : ''
 
-  if (d?.all_sheet !== 1 && !sheetNameString) return
+  //   if (d?.all_sheet !== 1 && !sheetNameString) return
 
-  // ✅ FINAL SUBMIT (NO ARRAY)
-  importDPR({
-    file: d.file[0],
-    sheet_name: sheetNameString, // 🔥 STRING ONLY
-    all_sheet: d?.all_sheet === 1
-  })
-}
+  //   // ✅ FINAL SUBMIT (NO ARRAY)
+  //   importDPR({
+  //     file: d.file[0],
+  //     sheet_name: sheetNameString, // 🔥 STRING ONLY
+  //     all_sheet: d?.all_sheet === 1
+  //   })
+  // }
 
 
-    useEffect(() => {
+  useEffect(() => {
     if (watch('all_sheet') === 1) {
       setValue('sheet_name', '')
     }
@@ -322,7 +322,7 @@ const DPRTable = () => {
         <Card>
           <CardBody>
             <Row>
-               {/* <div className="mt-2">
+              {/* <div className="mt-2">
       <h5 className="mt-1 fw-bolder">Tag</h5>
 
       <div className="tags-input-container d-flex flex-wrap align-items-center border p-1 rounded">
@@ -380,7 +380,7 @@ const DPRTable = () => {
                 You can import all project mapping data through a single Excel file
               </Col>
               <Col md='4'>
-                {/* <FormGroupCustom
+                <FormGroupCustom
                   key={String(result.isError) + String(result.isSuccess)}
                   label={FM('sheet-name')}
                   name={'sheet_name'}
@@ -389,35 +389,35 @@ const DPRTable = () => {
                   className='mb-0'
                   control={control}
                   rules={{ required: false }}
-                /> */}
+                />
 
-                <TagsInput
-  name="sheet_name"
-  control={control}
-  label="Sheet Name"
-  placeholder="Sheet Name"
+                {/* <TagsInput
+                  name="sheet_name"
+                  control={control}
+                  label="Sheet Name"
+                  placeholder="Sheet Name"
 
- prepend={
-                  
-                      <BsTooltip title={FM('all-sheet')}>
-                        <FormGroupCustom
-                          key={String(result.isError) + String(result.isSuccess)}
-                          noLabel
-                          label={FM('all-sheet')}
-                          name={`all_sheet`}
-                          type={'checkbox'}
-                          control={control}
-                          className={'ms-1 me-25'}
-                          rules={{
-                            required: false
-                          }}
-                        />
-                      </BsTooltip>
-                    
+                  prepend={
+
+                    <BsTooltip title={FM('all-sheet')}>
+                      <FormGroupCustom
+                        key={String(result.isError) + String(result.isSuccess)}
+                        noLabel
+                        label={FM('all-sheet')}
+                        name={`all_sheet`}
+                        type={'checkbox'}
+                        control={control}
+                        className={'ms-1 me-25'}
+                        rules={{
+                          required: false
+                        }}
+                      />
+                    </BsTooltip>
+
                   }
-  isDisabled={watch('all_sheet') === 1}
-/>
-                 {/* <FormGroupCustom
+                  isDisabled={watch('all_sheet') === 1}
+                /> */}
+                {/* <FormGroupCustom
                   key={String(result.isError) + String(result.isSuccess) + `${watch('all_sheet')}`}
                   label={FM('sheet-name')}
                   name={'sheet_name'}
@@ -449,7 +449,7 @@ const DPRTable = () => {
                     </InputGroupText>
                   }
                 /> */}
-                 {/* {watch('sheet_name') && (
+                {/* {watch('sheet_name') && (
     <div
       style={{
         marginTop: '0.25rem',

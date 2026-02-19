@@ -1,7 +1,7 @@
 /* eslint-disable no-mixed-operators */
 import { ThemeColors } from '@src/utility/context/ThemeColors'
 import { useContext, useEffect, useReducer } from 'react'
-import { Edit, MoreVertical, Plus, RefreshCcw, Server, Trash2 } from 'react-feather'
+import { Edit, MoreVertical, Plus, RefreshCcw, Server, Trash2, Upload } from 'react-feather'
 import { useLocation } from 'react-router-dom'
 import { ButtonGroup } from 'reactstrap'
 
@@ -27,6 +27,7 @@ import {
     useLoadItemDescMutation
 } from '../../redux/RTKQuery/ItemDescRTK'
 import ConfirmAlert from '@hooks/ConfirmAlert'
+import ModalImport from './ImportDescription'
 
 interface States {
     page?: any
@@ -38,6 +39,7 @@ interface States {
     isAddingNewData?: boolean
     lastRefresh?: any
     filterData?: DPR | any
+    show?: boolean
 }
 function ItemDescription() {
     const reloadID = new Date().getTime()
@@ -51,7 +53,8 @@ function ItemDescription() {
         per_page_record: 40,
         search: '',
         filterData: null,
-        lastRefresh: new Date().getTime()
+        lastRefresh: new Date().getTime(),
+        show: false
     }
     const reducers = stateReducer<States>
     const [state, setState] = useReducer(reducers, initState)
@@ -136,7 +139,7 @@ function ItemDescription() {
                 </div>
             )
         },
-            {
+        {
             name: FM('work-package'),
             sortable: true,
             minWidth: "200px",
@@ -234,8 +237,38 @@ function ItemDescription() {
 
     return (
         <>
+            <ModalImport
+
+                response={(e) => {
+                    setState({
+
+                        search: e
+                    })
+                }}
+                showModal={state.show}
+                setShowModal={(e: boolean) =>
+                    setState({
+                        show: e
+                    })
+                }
+                noView
+            />
             <Header icon={<Server size='25' />} title={FM('item-description')}>
                 <ButtonGroup color='dark'>
+                    <LoadingButton
+                        title={FM('import')}
+                        loading={false}
+                        size='sm'
+                        color="primary"
+                        className='me-2'
+                        onClick={() => {
+                            setState({
+                                show: true
+                            })
+                        }}
+                    >
+                        <Upload size='14' />
+                    </LoadingButton>
                     <Show IF={Permissions.itemDescriptionCreate}>
                         <TooltipLink
                             title={<>{FM('create-new')}</>}

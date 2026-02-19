@@ -307,20 +307,19 @@
     "execution-time": "Execution Time",
     "email-trigger": "Trigger Report",
     "enable-execution-time": "Automation On / Off",
-     "notifications":"Notifications",
-   
-    "read-status":"Read Status",
-    "read":"Read",
-    "unread":"Unread",
-    "duplicate":"Duplicate",
-    "sheet-update":"Sheet Update",
-    "sheet-create":"Sheet Create",
-    "uom":"Uom",
-    "sheet":"Sheet",
-    "select-sheet":"Select Sheet",
-    "manpower-sheet-name":"Manpower Sheet Name",
-     
-    "vendor-work-package":"Vendor Work Package",
-    "all-sheet":"All Sheet"
-
+    "notifications": "Notifications",
+    "read-status": "Read Status",
+    "read": "Read",
+    "unread": "Unread",
+    "duplicate": "Duplicate",
+    "sheet-update": "Sheet Update",
+    "sheet-create": "Sheet Create",
+    "uom": "Uom",
+    "sheet": "Sheet",
+    "select-sheet": "Select Sheet",
+    "manpower-sheet-name": "Manpower Sheet Name",
+    "vendor-work-package": "Vendor Work Package",
+    "all-sheet": "All Sheet",
+    "import": "Import",
+    "download-sample-file": "Download Sample File"
 }
